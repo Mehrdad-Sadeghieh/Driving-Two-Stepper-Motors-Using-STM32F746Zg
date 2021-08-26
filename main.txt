@@ -1,0 +1,761 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+//#include "string.h"
+//#include "lcd.h"
+//#include "stdio.h"
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim8;
+
+UART_HandleTypeDef huart4;
+
+/* USER CODE BEGIN PV */
+
+int STATE_IND = 0 ,STOP_IND = 100 ,STATE_FILE_PRO = 0 ,Rx_complate = 0;
+char file_copy[500000] = {5};
+//uint32_t volatile TIMER_OUT1 ;
+//uint32_t volatile TIMER_OUT2 ;
+//char BUFF[16];																					    												// for LCD
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_TIM1_Init(void);
+static void MX_UART4_Init(void);
+static void MX_TIM2_Init(void);
+static void MX_TIM8_Init(void);
+/* USER CODE BEGIN PFP */
+
+//void File_Processing(char *a);                                                      // founction for process on file
+//void delete_NULL(char *a ,char *b);                                                 // delete null character from a array and creat b array
+void Decode_File(char *a);                            																// decode file after processing
+void FIND_END(char *a);
+//void delay_us(volatile uint32_t us);
+//void delay_s(volatile uint32_t s);
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+  
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_TIM1_Init();
+  MX_UART4_Init();
+  MX_TIM2_Init();
+  MX_TIM8_Init();
+  /* USER CODE BEGIN 2 */
+	
+  HAL_SuspendTick();
+	HAL_UART_Receive_IT(&huart4 ,(unsigned char *)file_copy ,500000);
+	//HAL_TIM_Base_Start_IT(&htim1);
+	//HAL_TIM_Base_Start_IT(&htim2);
+  //lcd_init();
+	///lcd_clear();
+	
+  /* USER CODE END 2 */
+ 
+ 
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {		
+		while (STATE_FILE_PRO == 1)                                                        // start after process file
+		{
+			int i;
+      switch (file_copy[STATE_IND])
+      {
+      	case 1:
+				  GPIOA->BSRR = ((uint16_t)0x0020U);                                           // 5
+				  GPIOA->BSRR = ((uint16_t)0x0080U);																					 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+					GPIOA->BSRR = (uint32_t)((uint16_t)0x0010U) << 16;
+		  		GPIOA->BSRR = (uint32_t)((uint16_t)0x0040U) << 16;				  
+      		break;
+      	case 2:
+				  GPIOA->BSRR = ((uint16_t)0x0020U);                                           // 5
+				  GPIOA->BSRR = (uint32_t)((uint16_t)0x0080U) << 16;													 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+					GPIOA->BSRR = (uint32_t)((uint16_t)0x0010U) << 16;
+		  		GPIOA->BSRR = (uint32_t)((uint16_t)0x0040U) << 16;
+      		break;
+				case 3:
+				  GPIOA->BSRR = ((uint16_t)0x0020U);                                           // 5
+				  GPIOA->BSRR = ((uint16_t)0x0080U);																					 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+					GPIOA->BSRR = (uint32_t)((uint16_t)0x0010U) << 16;
+					break;
+				case 4:
+				  GPIOA->BSRR = (uint32_t)((uint16_t)0x0020U) << 16;                           // 5
+				  GPIOA->BSRR = ((uint16_t)0x0080U);																					 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+					GPIOA->BSRR = (uint32_t)((uint16_t)0x0010U) << 16;
+		  		GPIOA->BSRR = (uint32_t)((uint16_t)0x0040U) << 16;
+					break;
+				case 5:
+				  GPIOA->BSRR = (uint32_t)((uint16_t)0x0020U) << 16;                           // 5
+				  GPIOA->BSRR = (uint32_t)((uint16_t)0x0080U) << 16;													 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+					GPIOA->BSRR = (uint32_t)((uint16_t)0x0010U) << 16;
+		  		GPIOA->BSRR = (uint32_t)((uint16_t)0x0040U) << 16;
+					break;
+				case 6:
+				  GPIOA->BSRR = (uint32_t)((uint16_t)0x0020U) << 16;                           // 5
+				  GPIOA->BSRR = ((uint16_t)0x0080U);																					 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+					GPIOA->BSRR = (uint32_t)((uint16_t)0x0010U) << 16;
+					break;
+				case 7:
+				  GPIOA->BSRR = ((uint16_t)0x0020U);                                           // 5
+				  GPIOA->BSRR = ((uint16_t)0x0080U);																					 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+		  		GPIOA->BSRR = (uint32_t)((uint16_t)0x0040U) << 16;
+					break;
+				case 8:
+				  GPIOA->BSRR = ((uint16_t)0x0020U);                                           // 5
+				  GPIOA->BSRR = (uint32_t)((uint16_t)0x0080U) << 16;				  								 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+		  		GPIOA->BSRR = (uint32_t)((uint16_t)0x0040U) << 16;
+					break;
+				case 9:
+				  GPIOA->BSRR = ((uint16_t)0x0020U);                                           // 5
+				  GPIOA->BSRR = ((uint16_t)0x0080U);																					 // 7
+				  GPIOA->BSRR = ((uint16_t)0x0010U);																					 // 4
+		  		GPIOA->BSRR = ((uint16_t)0x0040U);																					 // 6
+				  i = 800;
+          while (i)
+					{
+						i--;
+					}
+					break;
+      }
+			STATE_IND += 4;
+	  	if (STATE_IND >= STOP_IND)                                                      // end of file and stop running motor
+		  {
+		  	STATE_FILE_PRO = 0;
+		  	STATE_IND = 0;
+		  }
+	  }
+		
+		if (Rx_complate == 1)                                                           // receive hole file and start moving motor
+		{	
+			FIND_END(file_copy);
+			Decode_File(file_copy);
+			STATE_FILE_PRO = 1;
+			Rx_complate = 0;	
+			STATE_IND = 0;
+		}
+		
+				
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage 
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  /** Initializes the CPU, AHB and APB busses clocks 
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Activate the Over-Drive mode 
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Initializes the CPU, AHB and APB busses clocks 
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4;
+  PeriphClkInitStruct.Uart4ClockSelection = RCC_UART4CLKSOURCE_PCLK1;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(void)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 54000;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 99;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
+
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 10800;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 29999;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
+  * @brief TIM8 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM8_Init(void)
+{
+
+  /* USER CODE BEGIN TIM8_Init 0 */
+
+  /* USER CODE END TIM8_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
+
+  /* USER CODE BEGIN TIM8_Init 1 */
+
+  /* USER CODE END TIM8_Init 1 */
+  htim8.Instance = TIM8;
+  htim8.Init.Prescaler = 10800;
+  htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim8.Init.Period = 8;
+  htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim8.Init.RepetitionCounter = 0;
+  htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim8, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 3;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
+  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
+  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
+  sBreakDeadTimeConfig.DeadTime = 0;
+  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+  sBreakDeadTimeConfig.BreakFilter = 0;
+  sBreakDeadTimeConfig.Break2State = TIM_BREAK2_DISABLE;
+  sBreakDeadTimeConfig.Break2Polarity = TIM_BREAK2POLARITY_HIGH;
+  sBreakDeadTimeConfig.Break2Filter = 0;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  if (HAL_TIMEx_ConfigBreakDeadTime(&htim8, &sBreakDeadTimeConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM8_Init 2 */
+
+  /* USER CODE END TIM8_Init 2 */
+  HAL_TIM_MspPostInit(&htim8);
+
+}
+
+/**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 115200;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, LCD_RS_Pin|LCD_RW_Pin|LCD_EN_Pin|LCD_D0_Pin 
+                          |LCD_D1_Pin|LCD_D2_Pin|LCD_D3_Pin|LCD_D4_Pin 
+                          |LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, PUL_1_Pin|PUL_2_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, DR_1_Pin|DR_2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, LED_GREEN_Pin|LED_REED_Pin|LED_BLUE_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : LCD_RS_Pin LCD_RW_Pin LCD_EN_Pin LCD_D0_Pin 
+                           LCD_D1_Pin LCD_D2_Pin LCD_D3_Pin LCD_D4_Pin 
+                           LCD_D5_Pin LCD_D6_Pin LCD_D7_Pin */
+  GPIO_InitStruct.Pin = LCD_RS_Pin|LCD_RW_Pin|LCD_EN_Pin|LCD_D0_Pin 
+                          |LCD_D1_Pin|LCD_D2_Pin|LCD_D3_Pin|LCD_D4_Pin 
+                          |LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PUL_1_Pin DR_1_Pin PUL_2_Pin DR_2_Pin */
+  GPIO_InitStruct.Pin = PUL_1_Pin|DR_1_Pin|PUL_2_Pin|DR_2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LED_GREEN_Pin LED_REED_Pin LED_BLUE_Pin */
+  GPIO_InitStruct.Pin = LED_GREEN_Pin|LED_REED_Pin|LED_BLUE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
+}
+
+/* USER CODE BEGIN 4 */
+
+
+
+/*
+void File_Processing(char *a)                                      // founction for process on file   &  size a == 500K
+{
+	int i;
+	for(i = 0 ;i == 524000 ;i++)
+  {
+		if (a[i] != 48)
+		{
+			if (a[i] != 49)
+			{
+				if(a[i] != 50)
+				{
+				a[i] = NULL;				
+				}
+			}
+		}
+  }
+}
+
+
+
+void delete_NULL(char *a ,char *b)                                 // delete null character from a array and creat b array  &  size b == 400K
+{
+	int i ,j = 0;
+	for(i = 0 ;i == 524000 ;i++)
+  {
+		if (a[i] != NULL)
+		{
+			b[j] = a[i];
+			j++;
+		}
+  }
+}
+*/
+
+void Decode_File(char *a)																																		// decode file after processing
+{
+	STATE_IND = 0;
+	while (STATE_IND <= STOP_IND)
+	{
+
+	  if (a[STATE_IND] == 49 && a[STATE_IND + 1] == 48 && a[STATE_IND + 2] == 49 && a[STATE_IND +3] == 48)
+	  {
+		  a[STATE_IND] = 1;
+		  STATE_IND += 4;
+    }	
+	  if (a[STATE_IND] == 48 && a[STATE_IND + 1] == 49 && a[STATE_IND + 2] == 48 && a[STATE_IND +3] == 49)
+	  {
+		  a[STATE_IND] = 5;
+		  STATE_IND += 4;
+    }
+	  if (a[STATE_IND] == 48 && a[STATE_IND + 1] == 48 && a[STATE_IND + 2] == 48 && a[STATE_IND +3] == 48)
+	  {
+		  a[STATE_IND] = 9;
+		  STATE_IND += 4;
+	  }
+	  if (a[STATE_IND] == 49 && a[STATE_IND + 1] == 48 && a[STATE_IND + 2] == 48 && a[STATE_IND +3] == 49)
+	  {
+		  a[STATE_IND] = 2;
+		  STATE_IND += 4;
+	  }
+	  if (a[STATE_IND] == 49 && a[STATE_IND + 1] == 48 && a[STATE_IND + 2] == 48 && a[STATE_IND +3] == 48)
+	  {
+		  a[STATE_IND] = 3;
+		  STATE_IND += 4;
+	  }
+	  if (a[STATE_IND] == 48 && a[STATE_IND + 1] == 49 && a[STATE_IND + 2] == 49 && a[STATE_IND +3] == 48)
+	  {
+		  a[STATE_IND] = 4;
+		  STATE_IND += 4;
+	  }
+	  if (a[STATE_IND] == 48 && a[STATE_IND + 1] == 49 && a[STATE_IND + 2] == 48 && a[STATE_IND +3] == 48)
+	  {
+		  a[STATE_IND] = 6;
+		  STATE_IND += 4;
+	  }
+	  if (a[STATE_IND] == 48 && a[STATE_IND + 1] == 48 && a[STATE_IND + 2] == 49 && a[STATE_IND +3] == 48)
+	  {
+		  a[STATE_IND] = 7;
+		  STATE_IND += 4;
+	  }
+	  if (a[STATE_IND] == 48 && a[STATE_IND + 1] == 48 && a[STATE_IND + 2] == 48 && a[STATE_IND +3] == 49)
+	  {
+		  a[STATE_IND] = 8;
+		  STATE_IND += 4;
+	  }
+  }
+	STATE_IND = 0;
+}
+
+void FIND_END(char *a)
+{
+  for(STATE_IND = 1500 ;STATE_IND <= 500000 ;STATE_IND++)
+  {
+		if (a[STATE_IND] == 50)
+		{
+			STOP_IND = STATE_IND;
+			break;
+		}
+  }
+	STATE_IND = 0;
+}
+/*
+void delay_us(volatile uint32_t us)
+{
+	TIMER_OUT1 = us;
+	while (TIMER_OUT1);
+}
+
+void delay_s(volatile uint32_t s)
+{
+	TIMER_OUT2 = s;
+	while (TIMER_OUT2);
+}
+*/
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{ 
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
